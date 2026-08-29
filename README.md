@@ -24,7 +24,7 @@ Long recordings containing silence can create events that disappear and unexpect
 Or you can fill all eight Tapes with goats. The machine will not stop you.
 
 ## Controls
- See AT8Manual.pdf
+ [Read the AssTap-8 manual](AT8Manual.pdf)
 
 The activity displays show the movement and destination of the major mutation processes:
 
