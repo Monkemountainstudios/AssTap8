@@ -1,9 +1,104 @@
-# AssTap 8
+# AssTap-8
+### Asynchronous Tape Machine
 
-AssTap 8 is a JUCE standalone audio application by MonkeMountainStudios / Sonic Onion.
+AssTap-8 is an eight-track asynchronous audio-loop machine for Windows and macOS.
 
-The `Source` directory is the completed, tested Windows application source. The shared application and DSP source is intentionally kept identical across Windows and macOS. Platform support is supplied by JUCE and the build configuration.
+Each Tape plays and evolves independently. Rather than synchronising material to a common clock, AssTap-8 allows loops to drift, mutate, reverse, filter, change level and pan, move through their source material, and gradually form new relationships over time.
 
+It is intended as an instrument for generative music, ambient composition, experimental looping, sound collage, and turning perfectly sensible recordings into things they were never supposed to become.
+
+## The basic idea
+
+Load up to eight audio files.
+
+Each Tape has its own playback state and can run independently of every other Tape. Enable **MUTATE** and the machine will gradually make decisions about that Tape over time.
+
+AssTap-8 is deliberately not a conventional synchronised looper. There is no requirement for matching tempos, matching lengths, bars, beats, or even remotely compatible source material.
+
+A three-second sound can coexist with a five-minute recording.
+
+Two copies of the same performance can slowly separate.
+
+Long recordings containing silence can create events that disappear and unexpectedly return much later.
+
+Or you can fill all eight Tapes with goats. The machine will not stop you.
+
+## Controls
+ See AT8Manual.pdf
+
+The activity displays show the movement and destination of the major mutation processes:
+
+`LOOP  FILTER  VOL  PAN  DIR  OCT`
+
+## Using space as a musical tool
+
+The source recording is part of the composition.
+
+A short, continuously sounding sample tends to produce dense repeating or drone-like material.
+
+Longer recordings containing pauses and empty space allow AssTap-8 to move through both sound and silence. Individual events may disappear for long periods before returning in unexpected combinations.
+
+There is no correct way to prepare material for AssTap-8.
+
+But by all means fill it with eight goats bleating if that's your thing.
+
+## Design philosophy
+
+AssTap-8 is based around slow, continuous change rather than rapid randomisation.
+
+A Tape generally begins a journey, completes that journey, and then decides what to do next. Parameters move toward destinations rather than simply jumping between random values.
+
+The intention is to create an evolving system that can be listened to and played, rather than a randomisation button that continually throws new settings at the audio.
+
+## Credits
+
+### Concept, design and direction
+**Magnus Lassila / Monke Mountain Studios**
+
+AssTap-8 was conceived, developed, tested and directed by Magnus Lassila as part of the Monke Mountain Studios collection of experimental music machines.
+
+### Development
+AssTap-8 was developed using **JUCE**.
+
+Programming and development were carried out through an AI-assisted workflow using **OpenAI ChatGPT** and **OpenAI Codex**, under the direction and extensive testing of Magnus Lassila.
+
+ChatGPT was used throughout the design and development process for technical implementation, DSP development, debugging, interface development, experimentation and documentation.
+
+Codex was used for code inspection, implementation assistance, project maintenance and platform/build work.
+
+### Framework
+**JUCE**  
+Copyright © Raw Material Software Limited.
+
+JUCE is used under its applicable licensing terms.
+
+Please see the JUCE licence and the project's accompanying licence/third-party notices for further information.
+
+## Testing
+
+AssTap-8 grew through extensive real-world use rather than being designed solely from a specification.
+
+It has been tested with material ranging from very short samples to multi-minute recordings, spoken word, drums, complete musical performances, environmental recordings and combinations that probably should never have been attempted.
+
+The strange results are generally intentional.
+
+## Platforms
+
+- Windows — Standalone
+- macOS — Standalone
+
+## Version
+
+**AssTap-8 1.0**
+
+## Licence
+
+Licence information will be included with the release.
+
+---
+
+**AssTap-8 // Asynchronous Tape Machine**  
+Monke Mountain Studios
 ## Supported standalone builds
 
 - Windows x64 (`.exe`)
