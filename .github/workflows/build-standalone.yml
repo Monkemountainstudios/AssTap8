@@ -1,0 +1,83 @@
+name: Build standalone applications
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows x64
+            os: windows-latest
+            artifact: AssTap8-Windows-x64
+          - name: macOS Universal
+            os: macos-15
+            artifact: AssTap8-macOS-Universal
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Configure Windows
+        if: runner.os == 'Windows'
+        run: cmake -S . -B build -A x64
+
+      - name: Configure macOS universal
+        if: runner.os == 'macOS'
+        run: >-
+          cmake -S . -B build -G Xcode
+          -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
+          -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
+
+      - name: Build Release
+        run: cmake --build build --config Release --parallel
+
+      - name: Package Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          Copy-Item -LiteralPath 'build/ASSTAP_8_artefacts/Release/ASSTAP_8.exe' -Destination 'dist/AssTap8-Windows-x64.exe'
+
+      - name: Ad-hoc sign and package macOS
+        if: runner.os == 'macOS'
+        run: |
+          mkdir -p dist
+          codesign --force --deep --sign - build/ASSTAP_8_artefacts/Release/ASSTAP_8.app
+          ditto -c -k --sequesterRsrc --keepParent build/ASSTAP_8_artefacts/Release/ASSTAP_8.app dist/AssTap8-macOS-Universal.zip
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.artifact }}
+          path: dist/*
+          if-no-files-found: error
+
+  release:
+    name: Publish GitHub release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Create release and upload both applications
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${GITHUB_REF_NAME}" dist/* --repo "${GITHUB_REPOSITORY}" --generate-notes
+
