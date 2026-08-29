@@ -24,11 +24,15 @@ Long recordings containing silence can create events that disappear and unexpect
 Or you can fill all eight Tapes with goats. The machine will not stop you.
 
 ## Controls
- [Read the AssTap-8 manual](AT8Manual.pdf)
 
-The activity displays show the movement and destination of the major mutation processes:
+ [Read the AssTap-8 manual](AT8Manual.pdf)
+Basically you load sound into each "tape" and if you want press mutate. The machine will then mutate the playback as set by the Probability setting.
+
+The activity displays beneath each "Tape" show the movement and destination of the major mutation processes:
 
 `LOOP  FILTER  VOL  PAN  DIR  OCT`
+
+You just set back and listen. 
 
 ## Using space as a musical tool
 
