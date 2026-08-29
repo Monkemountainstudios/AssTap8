@@ -25,7 +25,8 @@ Or you can fill all eight Tapes with goats. The machine will not stop you.
 
 ## Controls
 
- [Read the AssTap-8 manual](AT8Manual.pdf)
+[Read the AssTap-8 manual](AT8Manual.pdf)
+ 
 Basically you load sound into each "tape" and if you want press mutate. The machine will then mutate the playback as set by the Probability setting.
 
 The activity displays beneath each "Tape" show the movement and destination of the major mutation processes:
