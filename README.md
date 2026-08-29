@@ -58,9 +58,9 @@ The intention is to create an evolving system that can be listened to and played
 ## Credits
 
 ### Concept, design and direction
-**Magnus Lassila / Monke Mountain Studios**
+**Magnus Lassila / MonkeMountainStudios**
 
-AssTap-8 was conceived, developed, tested and directed by Magnus Lassila as part of the Monke Mountain Studios collection of experimental music machines.
+AssTap-8 was conceived, developed, tested and directed by Magnus Lassila as part of the MonkeMountainStudios collection of experimental music machines.
 
 ### Development
 AssTap-8 was developed using **JUCE**.
