@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(ASSTAP_8 VERSION 1.0.0 LANGUAGES C CXX)
+project(ASSTAP_8 VERSION 1.0.1 LANGUAGES C CXX)
 
 set(ASSTAP8_JUCE_SOURCE_DIR "" CACHE PATH "Path to a local JUCE 9.0.1 checkout")
 
@@ -18,7 +18,7 @@ else()
 endif()
 
 juce_add_gui_app(ASSTAP_8
-    VERSION 1.0.0
+    VERSION 1.0.1
     PRODUCT_NAME "ASSTAP_8"
     COMPANY_NAME "MonkeMountainStudios"
     COMPANY_WEBSITE "https://monkemountainstudios.neocities.org"

@@ -3,7 +3,7 @@
 <JUCERPROJECT id="cc0tXW" name="ASSTAP_8" projectType="guiapp" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" companyName="MonkeMountainStudios"
               companyCopyright="Sonic Onion" companyWebsite="monkemountainstudios.neocities.org"
-              version="1.0">
+              version="1.0.1">
   <MAINGROUP id="ZoeYuR" name="ASSTAP_8">
     <GROUP id="{22A336CC-ABA4-4924-BC9B-765805030961}" name="Source">
       <FILE id="pZ53dd" name="AT8.png.png" compile="0" resource="1" file="Source/AT8.png.png"/>
