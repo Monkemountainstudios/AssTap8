@@ -108,6 +108,7 @@ private:
     juce::Slider chorusSendKnob;
     juce::Slider reverbSendKnob;
     std::unique_ptr<juce::LookAndFeel> barLookAndFeel;
+    std::unique_ptr<juce::LookAndFeel> muteLookAndFeel;
     //--------------------------------------------------------------------------
     // Audio file
 

@@ -72,6 +72,84 @@ namespace
             g.drawRect(area, 1.0f);
         }
     };
+    class AssTapMuteLookAndFeel : public juce::LookAndFeel_V4
+    {
+    public:
+        void drawButtonText(juce::Graphics& g,
+            juce::TextButton& button,
+            bool,
+            bool) override
+        {
+            auto r = button.getLocalBounds().toFloat().reduced(7.0f, 5.0f);
+
+            const bool muted =
+                button.getProperties()["muteTarget"];
+
+            const bool transitioning =
+                button.getProperties()["muteTransition"];
+
+            const bool blinkOn =
+                button.getProperties()["muteBlink"];
+
+            // During a transition, blink the pictogram only.
+            if (transitioning && !blinkOn)
+                return;
+
+            auto colour = muted
+                ? juce::Colour(220, 95, 85)
+                : juce::Colour(205, 210, 212);
+
+            g.setColour(colour);
+
+            // Speaker body.
+            const float cx = r.getCentreX() - 3.0f;
+            const float cy = r.getCentreY();
+
+            juce::Path speaker;
+            speaker.startNewSubPath(cx - 7.0f, cy - 3.0f);
+            speaker.lineTo(cx - 3.0f, cy - 3.0f);
+            speaker.lineTo(cx + 1.0f, cy - 6.0f);
+            speaker.lineTo(cx + 1.0f, cy + 6.0f);
+            speaker.lineTo(cx - 3.0f, cy + 3.0f);
+            speaker.lineTo(cx - 7.0f, cy + 3.0f);
+            speaker.closeSubPath();
+
+            g.fillPath(speaker);
+
+            if (muted)
+            {
+                // Crossed-out speaker.
+                g.drawLine(cx + 5.0f, cy - 5.0f,
+                    cx + 12.0f, cy + 5.0f, 1.8f);
+
+                g.drawLine(cx + 12.0f, cy - 5.0f,
+                    cx + 5.0f, cy + 5.0f, 1.8f);
+            }
+            else
+            {
+                // Three simple sound rays.
+                // Short - long - short, fanning outward.
+
+                const float x = cx + 5.0f;
+                const float y = cy;
+
+                g.drawLine(
+                    x, y - 1.0f,
+                    x + 4.0f, y - 5.0f,
+                    1.5f);
+
+                g.drawLine(
+                    x + 1.0f, y,
+                    x + 7.0f, y,
+                    1.7f);
+
+                g.drawLine(
+                    x, y + 1.0f,
+                    x + 4.0f, y + 5.0f,
+                    1.5f);
+            }
+        }
+    };
 }
 //==============================================================================
 AssTapTrack::AssTapTrack(int number, juce::Colour colour)
@@ -242,7 +320,13 @@ AssTapTrack::AssTapTrack(int number, juce::Colour colour)
     // MUTE - manual 15-second fade, transport/mutations keep running.
 
     addAndMakeVisible(muteButton);
+    muteLookAndFeel =
+        std::make_unique<AssTapMuteLookAndFeel>();
 
+    muteButton.setLookAndFeel(
+        muteLookAndFeel.get());
+
+    muteButton.setButtonText("");
     muteButton.onClick = [this]
         {
             const juce::ScopedLock stateLock(audioStateLock);
@@ -269,10 +353,6 @@ AssTapTrack::AssTapTrack(int number, juce::Colour colour)
                             muteFadeSeconds * deviceSampleRate));
             }
 
-            muteButton.setButtonText(
-                targetMuteGain < 0.5f
-                ? "MUTED"
-                : "MUTE");
         };
 
     //--------------------------------------------------------------------------
@@ -291,6 +371,7 @@ AssTapTrack::~AssTapTrack()
     trimKnob.setLookAndFeel(nullptr);
     chorusSendKnob.setLookAndFeel(nullptr);
     reverbSendKnob.setLookAndFeel(nullptr);
+    muteButton.setLookAndFeel(nullptr);
 }
 //==============================================================================
 void AssTapTrack::prepareToPlay(int samplesPerBlockExpected,
@@ -2830,11 +2911,6 @@ void AssTapTrack::timerUpdate()
         currentMuteGain = muteTargetBeforeUnload;
         muteSamplesRemaining = 0;
 
-        muteButton.setButtonText(
-            targetMuteGain < 0.5f
-            ? "MUTED"
-            : "MUTE");
-
         unloadPending = false;
     }
     if (loopTargetActive &&
@@ -2883,6 +2959,27 @@ void AssTapTrack::timerUpdate()
                 currentJourney = MutationJourney::none;
         }
     }
+    const bool muteTarget =
+        targetMuteGain < 0.5f;
 
+    const bool muteTransition =
+        muteSamplesRemaining > 0;
+
+    const bool muteBlink =
+        ((juce::Time::getMillisecondCounter() / 350) % 2) == 0;
+
+    muteButton.getProperties().set(
+        "muteTarget",
+        muteTarget);
+
+    muteButton.getProperties().set(
+        "muteTransition",
+        muteTransition);
+
+    muteButton.getProperties().set(
+        "muteBlink",
+        muteBlink);
+
+    muteButton.repaint();
     repaint();
 }
