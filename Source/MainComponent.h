@@ -67,6 +67,7 @@ private:
     std::atomic<juce::AudioFormatWriter::ThreadedWriter*> activeWriter{ nullptr };
 
     double masterSampleRate = 44100.0;
+    float masterLimiterGain = 1.0f;
     juce::File currentRecordingFile;
     juce::Time recordingStartTime;
 

@@ -182,6 +182,7 @@ void MainComponent::prepareToPlay(int samplesPerBlockExpected,
     track8.prepareToPlay(samplesPerBlockExpected, sampleRate);
 
     masterSampleRate = sampleRate;
+    masterLimiterGain = 1.0f;
 
     trackBuffer1.setSize(
         2,
@@ -548,6 +549,47 @@ void MainComponent::getNextAudioBlock(
             0,
             numSamples,
             0.70f);
+    }
+
+    // Transparent final-master safety limiter. The peak detector is linked
+    // across every output channel, so all channels receive identical gain.
+    // Attack is immediate; gain returns conservatively to unity over 180 ms.
+    if (output.getNumChannels() > 0 && numSamples > 0)
+    {
+        constexpr float limiterCeiling = 0.96605086f; // -0.3 dBFS
+        constexpr double limiterReleaseSeconds = 0.180;
+        const float releaseCoefficient = static_cast<float>(std::exp(
+            -1.0 / (limiterReleaseSeconds * juce::jmax(1.0, masterSampleRate))));
+
+        for (int sample = 0; sample < numSamples; ++sample)
+        {
+            const int outputSample = bufferToFill.startSample + sample;
+            float linkedPeak = 0.0f;
+
+            for (int channel = 0; channel < output.getNumChannels(); ++channel)
+                linkedPeak = juce::jmax(linkedPeak,
+                    std::abs(output.getSample(channel, outputSample)));
+
+            const float requiredGain = linkedPeak > limiterCeiling
+                ? limiterCeiling / linkedPeak
+                : 1.0f;
+
+            if (requiredGain < masterLimiterGain)
+                masterLimiterGain = requiredGain;
+            else
+                masterLimiterGain = 1.0f
+                    - ((1.0f - masterLimiterGain) * releaseCoefficient);
+
+            if (masterLimiterGain > 0.999999f)
+                masterLimiterGain = 1.0f;
+
+            if (masterLimiterGain < 1.0f)
+            {
+                for (int channel = 0; channel < output.getNumChannels(); ++channel)
+                    output.setSample(channel, outputSample,
+                        output.getSample(channel, outputSample) * masterLimiterGain);
+            }
+        }
     }
 
     if (output.getNumChannels() > 0 && numSamples > 0)
