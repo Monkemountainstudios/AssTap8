@@ -35,6 +35,24 @@ namespace
             const auto colour =
                 slider.findColour(juce::Slider::trackColourId);
 
+            auto displayColour = colour;
+
+            if (slider.getProperties()["dimWithValue"])
+            {
+                const float proportion = static_cast<float>(
+                    slider.valueToProportionOfLength(slider.getValue()));
+
+                const float unityProportion = juce::jmax(0.001f,
+                    static_cast<float>(slider.valueToProportionOfLength(0.0)));
+
+                const float brightness = slider.getValue() < 0.0
+                    ? juce::jmap(juce::jlimit(0.0f, unityProportion, proportion),
+                        0.0f, unityProportion, 0.12f, 1.0f)
+                    : 1.0f;
+
+                displayColour = colour.withMultipliedBrightness(brightness);
+            }
+
             // Dark recessed slot.
             g.setColour(background);
             g.fillRect(area);
@@ -52,16 +70,16 @@ namespace
                 // Heavy edge shading with a broad flat bright centre:
                 // 25% ramp | 50% full colour | 25% ramp.
                 juce::ColourGradient gradient(
-                    colour.darker(0.65f),
+                    displayColour.darker(0.65f),
                     fill.getX(),
                     fill.getCentreY(),
-                    colour.darker(0.65f),
+                    displayColour.darker(0.65f),
                     fill.getRight(),
                     fill.getCentreY(),
                     false);
 
-                gradient.addColour(0.25, colour);
-                gradient.addColour(0.75, colour);
+                gradient.addColour(0.25, displayColour);
+                gradient.addColour(0.75, displayColour);
 
                 g.setGradientFill(gradient);
                 g.fillRect(fill);
@@ -267,9 +285,13 @@ AssTapTrack::AssTapTrack(int number, juce::Colour colour)
     trimKnob.setColour(juce::Slider::thumbColourId,
         juce::Colour(105, 195, 105).brighter(0.35f));
 
-    trimKnob.setRange(-18.0, 18.0, 0.1);
+    // The bottom position is a true off state; the rest of the range remains
+    // logarithmic in dB with unity kept at the visual midpoint.
+    trimKnob.setRange(-60.0, 18.0, 0.1);
+    trimKnob.setSkewFactorFromMidPoint(0.0);
     trimKnob.setValue(0.0);
     trimKnob.setTextValueSuffix(" dB");
+    trimKnob.getProperties().set("dimWithValue", true);
 
     //--------------------------------------------------------------------------
     // CHORUS SEND
@@ -491,6 +513,9 @@ float AssTapTrack::getSourceSample(int channel,
 //==============================================================================
 float AssTapTrack::getTrimGain() const
 {
+    if (trimKnob.getValue() <= trimKnob.getMinimum())
+        return 0.0f;
+
     return juce::Decibels::decibelsToGain(
         static_cast<float>(trimKnob.getValue()));
 }

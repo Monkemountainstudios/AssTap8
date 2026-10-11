@@ -73,8 +73,11 @@ private:
 
     std::atomic<float> masterRmsL{ 0.0f };
     std::atomic<float> masterRmsR{ 0.0f };
+    std::atomic<bool> masterOverloadDetected{ false };
     float vuDisplayL = 0.0f;
     float vuDisplayR = 0.0f;
+    double overloadWarningUntilMs = 0.0;
+    bool overloadWarningActive = false;
 
     void toggleRecording();
     void startRecording();

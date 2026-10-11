@@ -94,7 +94,7 @@ The strange results are generally intentional.
 
 ## Version
 
-**AssTap-8 1.0**
+**AssTap-8 1.1**
 
 ## Licence
 

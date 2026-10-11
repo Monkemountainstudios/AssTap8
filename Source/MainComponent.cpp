@@ -574,6 +574,9 @@ void MainComponent::getNextAudioBlock(
                 ? limiterCeiling / linkedPeak
                 : 1.0f;
 
+            if (requiredGain < 1.0f)
+                masterOverloadDetected.store(true, std::memory_order_relaxed);
+
             if (requiredGain < masterLimiterGain)
                 masterLimiterGain = requiredGain;
             else
@@ -656,6 +659,15 @@ void MainComponent::paint(juce::Graphics& g)
 
     auto drawVu = [&](juce::Rectangle<float> r, float level, const juce::String& lr)
         {
+            if (overloadWarningActive)
+            {
+                const auto warning = juce::Colour(235, 48, 38);
+                g.setColour(warning.withAlpha(0.16f));
+                g.fillRoundedRectangle(r.expanded(7.0f), 7.0f);
+                g.setColour(warning.withAlpha(0.92f));
+                g.drawRoundedRectangle(r.expanded(5.0f), 6.0f, 2.0f);
+            }
+
             g.setColour(juce::Colours::black.withAlpha(0.72f));
             g.fillRoundedRectangle(r.expanded(4.0f), 4.0f);
             auto face = r.reduced(3.0f);
@@ -891,6 +903,13 @@ void MainComponent::timerCallback()
         };
     vuDisplayL = ballistic(vuDisplayL, ml);
     vuDisplayR = ballistic(vuDisplayR, mr);
+
+    const double nowMs = juce::Time::getMillisecondCounterHiRes();
+
+    if (masterOverloadDetected.exchange(false, std::memory_order_relaxed))
+        overloadWarningUntilMs = nowMs + 5000.0;
+
+    overloadWarningActive = nowMs < overloadWarningUntilMs;
 
     repaint();
 }
